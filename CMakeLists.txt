@@ -1,0 +1,6 @@
+set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
+set(OpenCV_DIR "${CMAKE_SOURCE_DIR}/vcpkg/installed/x64-windows")
+find_package(OpenCV REQUIRED)
+include_directories(${OpenCV_INCLUDE_DIRS})
+add_executable(ocr_processing include/OCR/preprocessing.cpp)
+target_link_libraries(ocr_processing ${OpenCV_LIBS})
