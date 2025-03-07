@@ -19,4 +19,4 @@ if __name__ == "__main__":
     image_path = os.path.join(BASE_DIR, "sample-images", "preprocessed_license.jpeg")
 
     extracted_text = extract_text(image_path)
-    print("📝 Extracted Text:\n", extracted_text)
+    print("Extracted Text:\n", extracted_text)

@@ -7,7 +7,7 @@ def preprocess_image(image_path):
     img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
 
     if img is None:
-        raise FileNotFoundError(f"❌ OpenCV could not load image: {image_path}. Check file path and format.")
+        raise FileNotFoundError(f"OpenCV could not load image: {image_path}. Check file path and format.")
 
     # Resize for better OCR performance
     img = cv2.resize(img, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
@@ -37,4 +37,4 @@ if __name__ == "__main__":
     # Save processed image for debugging
     output_path = os.path.join(BASE_DIR, "sample-images", "preprocessed_license.jpeg")
     cv2.imwrite(output_path, processed_img)
-    print(f"✅ Preprocessed image saved: {output_path}")
+    print(f"Preprocessed image saved: {output_path}")
