@@ -1,22 +1,25 @@
-import pytesseract
-from preprocess import preprocess_image
+import easyocr
 import cv2
+from preprocess import detect_text_regions
 
 def extract_text(image_path):
-    """Extracts text from a preprocessed image using optimized Tesseract OCR."""
-    processed_img = preprocess_image(image_path)
+    """
+    Dynamically extracts text from detected regions using EasyOCR.
+    """
+    text_regions = detect_text_regions(image_path)
 
-    # Set Tesseract configuration
-    custom_config = r'--oem 3 --psm 6'  # Use OCR Engine Mode 3, Page Segmentation Mode 6
+    reader = easyocr.Reader(['en'], gpu=False)
+    extracted_texts = []
 
-    text = pytesseract.image_to_string(processed_img, config=custom_config)
-    return text.strip()
+    for i, region in enumerate(text_regions):
+        # Save region for debugging
+        temp_path = f"temp_region_{i}.png"
+        cv2.imwrite(temp_path, region)
 
-if __name__ == "__main__":
-    import os
+        results = reader.readtext(temp_path, detail=0)
+        extracted_texts.append(" ".join(results))
 
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    image_path = os.path.join(BASE_DIR, "sample-images", "preprocessed_license.jpeg")
+    return extracted_texts
 
-    extracted_text = extract_text(image_path)
-    print("Extracted Text:\n", extracted_text)
+# Example Usage:
+# extracted_data = extract_text("image.png")
