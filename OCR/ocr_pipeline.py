@@ -8,7 +8,7 @@ def extract_text(image_path):
     """
     text_regions = detect_text_regions(image_path)
 
-    reader = easyocr.Reader(['en'], gpu=False)
+    reader = easyocr.Reader(['ar', 'en'], gpu=False)
     extracted_texts = []
 
     for i, region in enumerate(text_regions):
