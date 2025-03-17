@@ -1,40 +1,32 @@
 import cv2
 import numpy as np
 
-def preprocess_image(image_path):
-    """Preprocess image to improve OCR accuracy."""
+def detect_text_regions(image_path):
+    """
+    Detects text regions dynamically using OpenCV contours.
+    Returns cropped text regions as images.
+    """
+    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
 
-    img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+    # Resize for better OCR readability
+    image = cv2.resize(image, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
 
-    if img is None:
-        raise FileNotFoundError(f"OpenCV could not load image: {image_path}. Check file path and format.")
+    # Apply Adaptive Thresholding for better text segmentation
+    _, thresh = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
-    # Resize for better OCR performance
-    img = cv2.resize(img, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
+    # Find contours (potential text blocks)
+    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    # Denoising to remove unnecessary noise
-    img = cv2.fastNlMeansDenoising(img, h=30)
+    text_regions = []
+    for contour in contours:
+        x, y, w, h = cv2.boundingRect(contour)
 
-    # Adaptive Thresholding for better text extraction
-    img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-                                cv2.THRESH_BINARY, 31, 2)
+        # Filter out small noise
+        if w > 50 and h > 10:
+            cropped = image[y:y+h, x:x+w]
+            text_regions.append(cropped)
 
-    # Morphological transformation to make text clearer
-    kernel = np.ones((1, 1), np.uint8)
-    img = cv2.dilate(img, kernel, iterations=1)
-    img = cv2.erode(img, kernel, iterations=1)
+    return text_regions
 
-    return img
-
-# Test preprocessing
-if __name__ == "__main__":
-    import os
-
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    image_path = os.path.join(BASE_DIR, "sample-images", "sample_drivers_license.jpeg")
-    processed_img = preprocess_image(image_path)
-
-    # Save processed image for debugging
-    output_path = os.path.join(BASE_DIR, "sample-images", "preprocessed_license.jpeg")
-    cv2.imwrite(output_path, processed_img)
-    print(f"Preprocessed image saved: {output_path}")
+# Example Usage:
+# text_blocks = detect_text_regions("image.png")
