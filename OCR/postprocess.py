@@ -1,13 +1,20 @@
 import re
+import bidi.algorithm as bidi
+from arabic_reshaper import reshape
 
 def clean_and_structure(text_blocks):
     """
-    Cleans OCR text and structures it into meaningful fields dynamically.
+    Cleans OCR text and structures it, ensuring Arabic text is reshaped and displayed correctly.
     """
     structured_data = {}
 
     for text in text_blocks:
-        if "ministry of interior" in text.lower():
+        # Fix Arabic text issues
+        if re.search(r"[\u0600-\u06FF]", text):  # Detect Arabic text
+            reshaped_text = reshape(text)  # Fix character order
+            formatted_text = bidi.get_display(reshaped_text)  # Fix right-to-left display
+            structured_data["arabic_text"] = formatted_text
+        elif "ministry of interior" in text.lower():
             structured_data["header"] = text
         elif re.search(r"\b\d{9,12}\b", text):
             structured_data["license_no"] = text
@@ -24,6 +31,3 @@ def clean_and_structure(text_blocks):
             structured_data["nationality"] = text
 
     return structured_data
-
-# Example Usage:
-# cleaned_data = clean_and_structure(["Ministry of Interior", "11/01/2021", "IND"])
