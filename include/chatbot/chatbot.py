@@ -1,5 +1,5 @@
 from transformers import pipeline, AutoModelForQuestionAnswering, AutoTokenizer
-from database import retrieve_document
+from include.chatbot.database import retrieve_document
 
 # Load AraBERT (Arabic NLP model)
 model_name = "aubmindlab/bert-base-arabertv02"

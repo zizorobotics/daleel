@@ -1,7 +1,12 @@
 from fastapi import FastAPI, HTTPException
-from chatbot import answer_legal_query
+from include.chatbot.chatbot import answer_legal_query
+
 
 app = FastAPI()
+
+@app.get("/")
+def home():
+    return {"message" : "Legal Document Chatbot API is working"}
 
 @app.get("/ask/")
 def ask_question(user_id: str, question: str):
